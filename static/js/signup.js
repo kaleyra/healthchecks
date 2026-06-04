@@ -30,7 +30,16 @@ window.addEventListener("DOMContentLoaded", function(e) {
             .then(signupResponse => signupResponse.text())
             .then(text => {
                 var resultLine = document.getElementById("signup-result");
-                resultLine.innerHTML = text;
+                resultLine.replaceChildren();
+                var doc = new DOMParser().parseFromString(text, "text/html");
+                doc.body.querySelectorAll("p").forEach(function(p) {
+                    var el = document.createElement("p");
+                    if (p.className) {
+                        el.className = p.className;
+                    }
+                    el.textContent = p.textContent;
+                    resultLine.appendChild(el);
+                });
                 resultLine.style.display = "block";
                 submitBtn.disabled = false;
             });
