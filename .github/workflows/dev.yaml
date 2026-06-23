@@ -67,3 +67,15 @@ jobs:
       image_name: ghcr.io/${{ needs.repo-name.outputs.repo-name }}:${{ github.run_number }}
       platforms: linux/amd64
       include_token_arg: true
+
+  deploy-healthchecks:
+    name: Deploy healthchecks service
+    needs: [repo-name, changes, build-healthchecks]
+    if: ((needs.changes.outputs.healthchecks == 'true' && github.event_name != 'workflow_dispatch') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_healthchecks == 'true')) && !(failure() || cancelled())
+    uses: kaleyra/kio-infra-dev/.github/workflows/deploy-eks.yml@master
+    secrets: inherit
+    with:
+      image_name: ghcr.io/${{ needs.repo-name.outputs.repo-name }}
+      image_version: ${{ github.event.inputs.healthchecks_version }}
+      manifest_path: mumbai-region/apps/voice/healthchecks/overlays/default
+      manifest_repo: kaleyra/kio-infra-dev
