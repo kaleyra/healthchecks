@@ -3,7 +3,7 @@ name: Dev-Pipeline
 
 on:
   push:
-    branches: ["github_actions"]
+    branches: ["github_actions","develop"]
 
   workflow_dispatch:
     inputs:
