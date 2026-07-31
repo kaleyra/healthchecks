@@ -1,0 +1,47 @@
+# This is a workflow to build and deploy to Dev environment
+name: Master-Pipeline
+
+on:
+
+  workflow_dispatch:
+    inputs:
+
+      run_polaris_scan:
+        description: 'Run Polaris Scan ?'
+        required: true
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
+      polaris_test_types:
+        description: 'Polaris Assessment Types ?'
+        required: true
+        default: 'SCA,SAST'
+        type: choice
+        options:
+          - SAST
+          - SCA
+          - 'SCA,SAST'
+      polaris_scan_type:
+        description: 'Polaris Test SAST type ?'
+        required: true
+        default: 'SAST_RAPID'
+        type: choice
+        options:
+          - SAST_FULL
+          - SAST_RAPID
+
+jobs:
+
+  polaris-scan:
+    name: Run Polaris Scan
+    if: inputs.run_polaris_scan == 'true' && github.ref_name == 'master'
+    uses: kaleyra/kio-infra-dev/.github/workflows/polaris-scan.yml@master
+    with:
+      channel_name: 'KIO Voice'
+      project_name: '${{ github.event.repository.name }}'
+      branch_name: ${{ github.ref_name }}
+      polaris_scan_type: ${{ inputs.polaris_scan_type || 'SAST_RAPID' }}
+      polaris_test_types: ${{ inputs.polaris_test_types || 'SCA,SAST' }}
+    secrets: inherit
